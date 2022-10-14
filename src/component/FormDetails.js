@@ -24,7 +24,7 @@ export const FormDetail = ({ localStorageData }) => {
       [name]: value,
     };
 
-    console.log(newState);
+    console.log("newState", newState);
     setState(newState);
   };
 
@@ -71,6 +71,7 @@ export const FormDetail = ({ localStorageData }) => {
                 variant="primary"
                 type="submit"
                 style={{ width: "50%", margin: "0 auto", marginBottom: "1rem" }}
+                onClick={() => null}
               >
                 Submit
               </Button>

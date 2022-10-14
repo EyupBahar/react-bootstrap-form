@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Button,
   Container,
@@ -14,23 +15,38 @@ export const FormModal = ({
   formData,
   setFormData,
 }) => {
-  const changeHandler = (e) => {
-    setFormData((formData) => {
-      return { ...formData, [e.target.name]: e.target.value };
+  const onSubmit = () => {
+    console.log("submitt");
+    addForm();
+    setFormData({
+      name: "",
+      description: "",
+      createdTime: "",
+      fields: [
+        {
+          name: "",
+          required: false,
+          dataType: "STRING",
+        },
+      ],
     });
+
+    handleClose();
   };
 
-  const MyDate = new Date();
-  let MyDateString;
+  useEffect(() => {
+    const currentdate = new Date();
+    const createdTime =
+      currentdate.getFullYear() +
+      "-" +
+      currentdate.getDate() +
+      "-" +
+      (currentdate.getMonth() + 1);
 
-  MyDate.setDate(MyDate.getDate() + 20);
-
-  MyDateString =
-    MyDate.getFullYear() +
-    "-" +
-    ("0" + (MyDate.getMonth() + 1)).slice(-2) +
-    "-" +
-    ("0" + MyDate.getDate()).slice(-2);
+    setFormData((formData) => {
+      return { ...formData, createdTime: createdTime };
+    });
+  }, []);
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -38,7 +54,7 @@ export const FormModal = ({
         <Modal.Title>CREATE FORM</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form className="ps-5 pe-5" onSubmit={changeHandler}>
+        <Form noValidate className="ps-5 pe-5" onSubmit={onSubmit}>
           <Form.Control
             className="mb-3"
             name="name"
@@ -50,7 +66,7 @@ export const FormModal = ({
             }}
             type="text"
             placeholder="Name"
-            required={true}
+            required
           />
           <Form.Control
             name="description"
@@ -63,14 +79,18 @@ export const FormModal = ({
             }}
             type="text"
             placeholder="Description"
-            required={true}
+            required
           />
           <Form.Control
+            disabled
             name="createdTime"
-            value={MyDateString}
+            value={formData.createdTime}
             type="string"
-            placeholder={MyDateString}
-            required={true}
+            onChange={(e) => {
+              const values = { ...formData };
+              values.createdTime = e.target.value;
+              setFormData(values);
+            }}
           />
           {formData.fields.map((item, idx) => (
             <Container key={idx}>
@@ -87,7 +107,6 @@ export const FormModal = ({
                   }}
                   type="text"
                   placeholder="Name"
-                  required={true}
                 />
                 <Row
                   style={{
@@ -136,7 +155,6 @@ export const FormModal = ({
           >
             <Button
               variant="primary"
-              type="submit"
               onClick={() => {
                 setFormData({
                   ...formData,
@@ -157,13 +175,15 @@ export const FormModal = ({
             </Button>
             <Button
               variant="danger"
-              type="submit"
               onClick={(item) => {
-                if (formData.length === 1) {
+                if (formData.fields.length === 1) {
                   return;
                 }
-                formData.splice(item, 1);
-                setFormData([...formData]);
+
+                setFormData({
+                  ...formData,
+                  fields: formData.fields.slice(0, -1),
+                });
               }}
               size="lg"
               style={{ width: "30%" }}
@@ -171,35 +191,18 @@ export const FormModal = ({
               Remove
             </Button>
           </Row>
+          <Modal.Footer style={{ display: "flex", justifyContent: "center" }}>
+            <Button
+              variant="primary"
+              type="submit"
+              size="lg"
+              style={{ width: "50%" }}
+            >
+              Create Form
+            </Button>
+          </Modal.Footer>
         </Form>
       </Modal.Body>
-      <Modal.Footer style={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          variant="primary"
-          type="submit"
-          onClick={() => {
-            addForm();
-            setFormData({
-              name: "",
-              description: "",
-              createdTime: "",
-              fields: [
-                {
-                  name: "",
-                  required: false,
-                  dataType: "STRING",
-                },
-              ],
-            });
-
-            handleClose();
-          }}
-          size="lg"
-          style={{ width: "50%" }}
-        >
-          Create Form
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 };
